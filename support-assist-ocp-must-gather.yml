@@ -20,7 +20,7 @@
     case_id: ""  # Blank to trigger creation flow
     ocp_must_gather_validate_ssl: false #  Set to false to skip SSL validation (useful for self-signed certs) 
     upload: true  # Set to true to upload the must-gather to the case after creation
-    # ===============================================================================
+
   tasks:
     - name: "Block - Full Automation Execution Pipeline"
       block:
@@ -29,7 +29,8 @@
         - name: "Block - Generate OCP Must Gather"
           block:
             - name: "RUN: OCP Must Gather (Login, Collect, and Archive)"
-              ansible.builtin.import_playbook: infra.support_assist.ocp_must_gather
+              ansible.builtin.include_role:
+                name: ocp_must_gather
           rescue:
             - name: "Rescue | Must Gather failed"
               ansible.builtin.fail:
@@ -39,7 +40,8 @@
         - name: "Block - Refresh Red Hat API Token"
           block:
             - name: "Call rh_token_refresh role (CRITICAL: Gets Red Hat API token)"
-              ansible.builtin.import_playbook: infra.support_assist.rh_token_refresh
+              ansible.builtin.include_role:
+                name: rh_token_refresh
           rescue:
             - name: "Rescue | Token Refresh failed"
               ansible.builtin.fail:
@@ -50,7 +52,8 @@
           when: case_id | length == 0
           block:
             - name: Call rh_case_create role (Creates case and sets new_case_id)
-              ansible.builtin.import_playbook: infra.support_assist.rh_case_create
+              ansible.builtin.include_role:
+                name: rh_case_create
               vars:
                 # Pass empty strings for variables the role incorrectly requires at top-level
                 attachment: "" 
@@ -71,7 +74,8 @@
             - upload | default(true) | bool
           block:
             - name: Call rh_case_update role (Uploads file and comment)"
-              ansible.builtin.import_playbook: infra.support_assist.rh_case_update
+              ansible.builtin.include_role:
+                name: rh_case_update
               vars:
                 attachment: ""
                 comment: ""

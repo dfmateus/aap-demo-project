@@ -1,9 +1,5 @@
 ---
 collections:
-#   - name: infra.support_assist
-#     source: https://github.com/redhat-cop/infra.support_assist.git
-#     version: devel
-#     type: git
   - name: infra.support_assist
     source: https://github.com/dfmateus/infra.support_assist.git
     version: api-case-creation-v1

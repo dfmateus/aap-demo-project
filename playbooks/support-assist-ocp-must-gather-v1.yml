@@ -6,6 +6,7 @@
   any_errors_fatal: true
 
   vars:
+    ANSIBLE_COLLECTIONS_PATHS_VALUE: "/home/runner/.ansible/collections:/usr/share/ansible/collections"
     # ===============================================================================
     # Hardcoded variables set here for pipeline execution.
     # ===============================================================================
@@ -18,9 +19,6 @@
     ocp_must_gather_validate_ssl: false # Set to false to skip SSL validation (useful for self-signed certs) 
     upload: true  # Set to true to upload the must-gather to the case after creation
     # ===============================================================================
-    
-    COLLECTION_PATH_ENV:
-      ANSIBLE_COLLECTIONS_PATHS: "/home/runner/.ansible/collections:/usr/share/ansible/collections"
 
   tasks:
     # --- TASK TO SET ANSIBLE_COLLECTIONS_PATHS ENVIRONMENT VARIABLE (HIGH PRIORITY) ---
@@ -28,7 +26,7 @@
       ansible.builtin.set_fact:
         # We set this as a fact to ensure it's available in the environment block below
         ansible_collection_env:
-          ANSIBLE_COLLECTIONS_PATHS: "{{ COLLECTION_PATHS }}"
+          ANSIBLE_COLLECTIONS_PATHS: "{{ ANSIBLE_COLLECTIONS_PATHS_VALUE }}"
 
     - name: "Block - Full Automation Execution Pipeline"
       block:
@@ -38,6 +36,7 @@
             - name: "RUN: OCP Must Gather (Login, Collect, and Archive)"
               ansible.builtin.include_role:
                 name: infra.support_assist.ocp_must_gather
+              environment: "{{ ansible_collection_env }}"
           rescue:
             - name: "Rescue | Must Gather failed"
               ansible.builtin.fail:
@@ -49,6 +48,7 @@
             - name: "Call rh_token_refresh role (CRITICAL: Gets Red Hat API token)"
               ansible.builtin.include_role:
                 name: infra.support_assist.rh_token_refresh
+              environment: "{{ ansible_collection_env }}"
           rescue:
             - name: "Rescue | Token Refresh failed"
               ansible.builtin.fail:
@@ -61,6 +61,7 @@
             - name: Call rh_case_create role (Creates case and sets new_case_id)
               ansible.builtin.include_role:
                 name: infra.support_assist.rh_case_create
+              environment: "{{ ansible_collection_env }}"
               vars:
                 # Pass empty strings for variables the role incorrectly requires at top-level
                 attachment: "" 
@@ -83,6 +84,7 @@
             - name: Call rh_case_update role (Uploads file and comment)"
               ansible.builtin.include_role:
                 name: infra.support_assist.rh_case_update
+              environment: "{{ ansible_collection_env }}"
               vars:
                 attachment: ""
                 comment: ""

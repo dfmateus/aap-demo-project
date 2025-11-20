@@ -30,7 +30,7 @@
           block:
             - name: "RUN: OCP Must Gather (Login, Collect, and Archive)"
               ansible.builtin.include_role:
-                name: ocp_must_gather
+                name: infra.support_assist.ocp_must_gather
           rescue:
             - name: "Rescue | Must Gather failed"
               ansible.builtin.fail:
@@ -41,7 +41,7 @@
           block:
             - name: "Call rh_token_refresh role (CRITICAL: Gets Red Hat API token)"
               ansible.builtin.include_role:
-                name: rh_token_refresh
+                name: infra.support_assist.rh_token_refresh
           rescue:
             - name: "Rescue | Token Refresh failed"
               ansible.builtin.fail:
@@ -53,7 +53,7 @@
           block:
             - name: Call rh_case_create role (Creates case and sets new_case_id)
               ansible.builtin.include_role:
-                name: rh_case_create
+                name: infra.support_assist.rh_case_create
               vars:
                 # Pass empty strings for variables the role incorrectly requires at top-level
                 attachment: "" 
@@ -75,7 +75,7 @@
           block:
             - name: Call rh_case_update role (Uploads file and comment)"
               ansible.builtin.include_role:
-                name: rh_case_update
+                name: infra.support_assist.rh_case_update
               vars:
                 attachment: ""
                 comment: ""

@@ -1,0 +1,6 @@
+---
+- name: infra.support_assist
+  src: https://github.com/dfmateus/infra.support_assist.git
+  scm: git
+  version: api-case-creation-v1
+...

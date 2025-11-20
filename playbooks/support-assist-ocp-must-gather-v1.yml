@@ -19,9 +19,8 @@
     upload: true  # Set to true to upload the must-gather to the case after creation
     # ===============================================================================
     
-    # 🔑 CRITICAL FIX: Explicitly set the collection paths to ensure FQCN is resolved in the EE.
-    # This variable is needed because the runner may not correctly map the current project path.
-    COLLECTION_PATHS: "/home/runner/.ansible/collections:/usr/share/ansible/collections"
+    COLLECTION_PATH_ENV:
+      ANSIBLE_COLLECTIONS_PATHS: "/home/runner/.ansible/collections:/usr/share/ansible/collections"
 
   tasks:
     # --- TASK TO SET ANSIBLE_COLLECTIONS_PATHS ENVIRONMENT VARIABLE (HIGH PRIORITY) ---
@@ -39,8 +38,6 @@
             - name: "RUN: OCP Must Gather (Login, Collect, and Archive)"
               ansible.builtin.include_role:
                 name: infra.support_assist.ocp_must_gather
-              # Apply the environment variable to ensure role resolution
-              environment: "{{ ansible_collection_env }}" 
           rescue:
             - name: "Rescue | Must Gather failed"
               ansible.builtin.fail:
@@ -52,7 +49,6 @@
             - name: "Call rh_token_refresh role (CRITICAL: Gets Red Hat API token)"
               ansible.builtin.include_role:
                 name: infra.support_assist.rh_token_refresh
-              environment: "{{ ansible_collection_env }}"
           rescue:
             - name: "Rescue | Token Refresh failed"
               ansible.builtin.fail:
@@ -70,7 +66,6 @@
                 attachment: "" 
                 comment: ""
                 upload_body_raw: ""
-              environment: "{{ ansible_collection_env }}"
                 
             - name: Set global case_id to newly created ID
               ansible.builtin.set_fact:
@@ -92,7 +87,6 @@
                 attachment: ""
                 comment: ""
                 upload_body_raw: ""
-              environment: "{{ ansible_collection_env }}"
           rescue:
             - name: "Rescue | Upload failed"
               ansible.builtin.fail:

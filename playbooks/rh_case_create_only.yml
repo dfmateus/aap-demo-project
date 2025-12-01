@@ -33,7 +33,7 @@
           block:
             - name: "RUN: Red Hat SSO Access Token Manager Execution Summary"
               ansible.builtin.include_role:
-                name: rh_token_refresh
+                name: infra.support_assist.rh_token_refresh
           rescue:
             - name: "Rescue | Token Refresh failed"
               ansible.builtin.fail:
@@ -44,7 +44,7 @@
           block:
             - name: Call rh_case_create role (Creates case and sets new_case_id)
               ansible.builtin.include_role:
-                name: rh_case_create
+                name: infra.support_assist.rh_case_create
               vars:
                 # Pass empty strings for variables the role incorrectly requires at top-level
                 attachment: ""
